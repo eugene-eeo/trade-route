@@ -1,3 +1,4 @@
+from collections import defaultdict
 from trade_route import *
 
 p = lambda a,b: frozenset([a,b])
@@ -78,15 +79,15 @@ config = ShipConfig(
         )
 
 
-k = 2
-route, gain, cost = find_path(
-    [A, A1, B, B1, B2, V, V1, M],
-    Ship(config, A, set()),
-    1691,
-    k,
-    )
-print('Arms:', k)
-print(' '.join(p.id for p in route))
-print('Length: ', len(route))
-print('Gain:', gain)
-print('Cost:', cost)
+for k in range(2, 5+1):
+    route, gain, cost = find_path(
+        [A, A1, B, B1, B2, V, V1, M],
+        Ship(config, A, set()),
+        1691,
+        k,
+        )
+    print('Arms:', k)
+    print(' '.join(p.id for p in route))
+    print('Length: ', len(route))
+    print('Gain:', gain)
+    print('Cost:', cost)

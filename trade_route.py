@@ -1,6 +1,5 @@
-import random
 from heapq import nlargest
-from collections import namedtuple, defaultdict
+from collections import namedtuple
 
 
 Item       = namedtuple('Item', 'dest,price')
@@ -68,14 +67,14 @@ class Planet:
     def __repr__(self):
         return 'Planet(%r)' % (self.id,)
 
-    def with_items(self, iv):
+    def with_items(self, items):
         return Planet(self.id, items)
 
 
 def find_path(planets, ship, hydrogen, k,
-        gain_weight=1.0, # weighting for credit gain, ++ if aiming to maximise
-        cost_weight=1.0, # weighting for hydrogen use, ++ if aiming to conserve
-        ):
+            gain_weight=1.0, # weighting for credit gain, ++ if aiming to maximise
+            cost_weight=1.0, # weighting for hydrogen use, ++ if aiming to conserve
+            ):
     total_gain = 0
     total_cost = 0
     route = [ship.planet]
@@ -100,10 +99,10 @@ def find_path(planets, ship, hydrogen, k,
     return route, total_gain, total_cost
 
 
-def _move(ship, planet, shipments):
-    src = ship.planet 
+def _move(ship, dst, shipments):
+    src = ship.planet
     S = shipments.copy()
-    ship, S[src] = ship.load_move(planet, shipments[src])
+    ship, S[src] = ship.load_move(dst, shipments[src])
     return ship, S
 
 
@@ -126,23 +125,21 @@ def kfind(shipments, ship, hydrogen, k):
                 continue
             if gain == 0:
                 continue
-            #print(''.join(p.id for p in ship.history), gain - cost)
             R.append((gain, cost, ship, shipments))
             continue
 
-        for planet in shipments:
-            if planet == ship.planet:
+        for dst in shipments:
+            if dst == ship.planet:
                 continue
             # load items from the current planet and move to the
             # new planet
-            new_ship, new_shipments = _move(ship, planet, shipments)
+            new_ship, new_shipments = _move(ship, dst, shipments)
             q.append((
                 step + 1,
                 new_shipments,
                 gain,
-                cost + ship.cost_to(planet),
+                cost + ship.cost_to(dst),
                 new_ship,
                 ))
 
-    #print('---')
-    return [(g, c, s, S) for g, c, s, S in R]
+    return R
